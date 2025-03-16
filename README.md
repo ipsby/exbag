@@ -2,9 +2,7 @@
 Backend untuk Excess Baggage
 
 # app server
-ExBag
-https://api.garuda.imaniprima.co.id  
-202.152.24.158:30249  
+https://api.garuda.imaniprima.co.id   
 IP		 : 192.168.1.249  
 User     : devel  
 Password : Imaniprima11  
