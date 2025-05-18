@@ -23,6 +23,7 @@ import com.iman.exbag.repository.BookingRepository;
 import com.iman.exbag.repository.FlightRepository;
 import com.iman.exbag.repository.PaxRepository;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
@@ -39,12 +40,18 @@ public class ExternalApiService {
     
     @Autowired
     private PaxRepository paxRepository;
+
+	@Value("${flight.list.url}")
+	private String flightListUrl;
+
+	@Value("${booking.list.url}")
+	private String bookingListUrl;
   
     public String processingFlight(String beginDate, String endDate, String oriPort, String desPort) {
     	//format date yyyy-mm-dd
     	String tglMulai[] = beginDate.split("-");
     	String tglSelesai[] = endDate.split("-");   	
-    	String externalApiUrl = "https://sapp-api.asyst.co.id/exbag-dcs-dev/DCSLST_FlightListDisplay";
+    	//String externalApiUrl = "https://sapp-api.asyst.co.id/exbag-dcs-dev/DCSLST_FlightListDisplay";
     	String bearerToken = "810859fc-7b18-3d2f-a79c-eb9712d236ec";
     	String jsonBody = String.format("{ \"data\": { \"carrier\": { \"companyIdentification\": { \"operatingCompany\": \"GA\" } }, \"searchPeriod\": { \"businessSemantic\": \"SDT\", \"beginDateTime\": { \"year\": %s, \"month\": %s, \"day\": %s, \"hour\": 0, \"minutes\": 1 }, \"endDateTime\": { \"year\": %s, \"month\": %s, \"day\": %s, \"hour\": 23, \"minutes\": 59 } }, \"portCode\": [ { \"airportCode\": \"%s\" }, { \"airportCode\": \"%s\" } ], \"displayType\": { \"statusInformation\": { \"indicator\": \"DD\" } } } }", 
     			tglMulai[0], tglMulai[1], tglMulai[2], tglSelesai[0], tglSelesai[1], tglSelesai[2], oriPort, desPort);
@@ -53,17 +60,18 @@ public class ExternalApiService {
         headers.setBearerAuth(bearerToken);
         headers.setContentType(MediaType.APPLICATION_JSON);
         headers.set("env", "PDT"); // Add additional headers if needed
-        headers.set("oid", "JKTGA0605");
-        
-        String responseBody = this.requestApiJson(externalApiUrl, headers, jsonBody);
+        //headers.set("oid", "JKTGA0605");
+		headers.set("oid", "CGKGA00CM");
+
+        String responseBody = this.requestApiJson(flightListUrl, headers, jsonBody);
         List<Flight> flights = parseFlightJson(responseBody);
-        flightRepository.saveAll(flights);
-        return "Success";
+		List<Flight> f = flightRepository.saveAll(flights);
+        return f.size() + " rows processed.";
     }
     
     public String processingBooking(String flightNo, String depDate, String boardPoint) {
-    	//format date yyyymmdd
-    	String externalApiUrl = "https://sapp-api.asyst.co.id/exbag-dcs-dev/DCSLST_GetPassengerList";
+    	//format date yyyyMMdd
+    	//String externalApiUrl = "https://sapp-api.asyst.co.id/exbag-dcs-dev/DCSLST_GetPassengerList";
     	String bearerToken = "810859fc-7b18-3d2f-a79c-eb9712d236ec";
     	String jsonBody = String.format("{ \"data\": { \"flightInfo\": { \"carrierDetails\": { \"marketingCarrier\": \"GA\" }, \"flightDetails\": { \"flightNumber\": %s }, \"departureDate\": \"%s\", \"boardPoint\": \"%s\" } } }", 
     			flightNo, depDate, boardPoint);
@@ -74,11 +82,11 @@ public class ExternalApiService {
         headers.set("env", "PDT"); // Add additional headers if needed
         headers.set("oid", "JKTGA0605");
         
-        String responseBody = this.requestApiJson(externalApiUrl, headers, jsonBody);
+        String responseBody = this.requestApiJson(bookingListUrl, headers, jsonBody);
         List<Booking> bookings = parseBookingJson(responseBody);
-        this.saveAllBooking(bookings);
+		List<Booking> b = this.saveAllBooking(bookings);
         
-        return "Success";
+        return b.size() + " rows processed.";
     }
 
     private String requestApiJson(String url, HttpHeaders htHeaders, String jsonBody) {
@@ -102,8 +110,15 @@ public class ExternalApiService {
     }
     
     private Date convertTextToDate(String tgl, String format) throws ParseException {
-    	return new SimpleDateFormat(format, Locale.ENGLISH).parse(tgl);
+		SimpleDateFormat formatter = new SimpleDateFormat(format);
+		return formatter.parse(tgl);
     }
+
+	private java.sql.Date convertTextToSqlDate(String tgl, String format) throws ParseException {
+		SimpleDateFormat formatter = new SimpleDateFormat(format);
+		java.util.Date utilDate = formatter.parse(tgl);
+		return new java.sql.Date(utilDate.getTime());
+	}
     
     private List<Booking> saveAllBooking(List<Booking> bookings) {
     	List<Booking> savedBookings = new ArrayList<Booking>();
@@ -123,11 +138,12 @@ public class ExternalApiService {
             List<Flight> flights = new ArrayList<>();
             for (JsonNode item : dataNode) {
             	Flight flight = new Flight();
+
             	flight.setFlightNo(item.path("flightId").path("flightDetails").path("flightNumber").asText());
             	flight.setOperatingCarrier(item.path("flightId").path("flightDetails").path("operatingCarrier").asText());
             	flight.setBoardPoint(item.path("flightId").path("boardPoint").asText());
             	flight.setOffPoint(item.path("flightId").path("offPoint").asText());
-            	flight.setDepartureDate(new java.sql.Date(convertTextToDate(item.path("flightId").path("departureDate").asText(), "yyyymmdd").getTime()));
+				flight.setDepartureDate(convertTextToSqlDate(item.path("flightId").path("departureDate").asText(), "yyyyMMdd"));
             	
             	java.sql.Timestamp saiki = new java.sql.Timestamp(Calendar.getInstance().getTimeInMillis());
             	flight.setCreatedAt(saiki);
@@ -159,7 +175,7 @@ public class ExternalApiService {
             	//uniqueCustomerId.idSection.primeId
             	pax.setPaxNik(item.path("uniqueCustomerId").path("idSection").path("primeId").asText());
             	//productLevel.flightInformation.flightDate.departureDate
-            	java.sql.Date flightDate = new java.sql.Date(convertTextToDate(item.path("productLevel").path("flightInformation").path("flightDate").path("departureDate").asText(), "yyyymmdd").getTime());
+            	java.sql.Date flightDate = new java.sql.Date(convertTextToDate(item.path("productLevel").path("flightInformation").path("flightDate").path("departureDate").asText(), "yyyyMMdd").getTime());
             	pax.setDepartureDate(flightDate);
             	//productLevel.flightInformation.boardPointDetails.trueLocationId
             	
@@ -174,7 +190,7 @@ public class ExternalApiService {
             	pax.setGaMilesNo("");
             	pax.setGaMilesTier("");
             	pax.setFreeBagAllow(20);
-            	pax.setTotalBagWeight(0);
+            	pax.setTotalBagWeight(0.0);
             	java.sql.Timestamp saiki = new java.sql.Timestamp(Calendar.getInstance().getTimeInMillis());
             	pax.setCreatedAt(saiki);
             	pax.setUpdatedAt(saiki);

@@ -50,7 +50,7 @@ class ExbagApplicationTests {
     	pax.setGaMilesNo("");
     	pax.setGaMilesTier("");
     	pax.setFreeBagAllow(20);
-    	pax.setTotalBagWeight(0);
+    	pax.setTotalBagWeight(0.0);
     	pax.setCreatedAt(saiki);
     	pax.setUpdatedAt(saiki);
     	pax.setDeletedAt(null);
