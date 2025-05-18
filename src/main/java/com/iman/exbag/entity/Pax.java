@@ -38,11 +38,33 @@ public class Pax {
 	private String gaMilesNo;
 	private String gaMilesTier;
 	private Integer freeBagAllow;
-	private Integer totalBagWeight;
+	private Double totalBagWeight;
+	private Double excessWeight;
+	private Double excessCharge;
+	private Boolean statusPayment;
+
+	// informasi KTP
+	private String ktpNik;
+	private String ktpNama;
+	private String ktpTptLahir;
+	private Date ktpTglLahir;
+	private Boolean ktpKelamin;
+	private Character ktpGolDarah;
+	private String ktpAlamat;
+	private String ktpRt;
+	private String ktpRw;
+	private String ktpDesa;
+	private String ktpKecamatan;
+	private String ktpPekerjaan;
+	private String ktpCitizenship;
+
+
 	private Timestamp createdAt;
 	private Timestamp updatedAt;
 	private Timestamp deletedAt;
-	
+
+	private Long paymentId;
+
 	// Many-to-one relationship with Booking
     @ManyToOne
     @JoinColumn(name = "booking_id", nullable = false)
