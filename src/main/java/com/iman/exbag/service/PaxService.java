@@ -8,8 +8,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import com.iman.exbag.exception.EntityNotFoundException;
 
-import java.util.List;
-
 @Service
 public class PaxService {
     @Autowired
