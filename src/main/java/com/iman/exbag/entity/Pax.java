@@ -29,6 +29,8 @@ public class Pax {
 	
 	private String paxName;
 	private String paxNik;
+	private String paxEmail;
+	private String paxPhone;
 	private Date departureDate;
 	private String departureAirport;
 	private String destinationAirport;

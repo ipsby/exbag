@@ -8,7 +8,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.iman.exbag.entity.Booking;
@@ -37,6 +36,6 @@ public class BookingController {
     
     @GetMapping("/pnr/{pnr_code}")
     public List<Booking> findBookingsByPnrCode(@PathVariable String pnr_code) {
-        return bookingService.findBookingsByPnrCode(pnr_code);
+        return bookingService.getBookingsByPnrCodeWithTruePaidStatusPaxes(pnr_code);
     }
 }

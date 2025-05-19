@@ -15,6 +15,8 @@ public class Payment {
     private String transId;
     private Long totalPax;
     private Double totalAmount;
+    private Double totalWaiveWeight;
+    private Double totalWaiveAmount;
     private String paymentMethod;
     private String status;
 

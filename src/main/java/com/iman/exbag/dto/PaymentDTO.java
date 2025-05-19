@@ -10,5 +10,5 @@ public class PaymentDTO {
     Long total_passengers;
 
     List<PassengerDTO> passengers;
-    PaymentDetailsDTO paymentDetails;
+    PaymentDetailsDTO payment_details;
 }

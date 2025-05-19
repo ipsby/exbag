@@ -27,9 +27,11 @@ public class PaymentService {
         Payment newPay = new Payment();
         newPay.setTransId(paymentRaw.getTransaction_id());
         newPay.setTotalPax(paymentRaw.getTotal_passengers());
-        newPay.setTotalAmount(paymentRaw.getPaymentDetails().getTotal_amount());
-        newPay.setPaymentMethod(paymentRaw.getPaymentDetails().getPayment_method());
-        newPay.setStatus(paymentRaw.getPaymentDetails().getStatus());
+        newPay.setTotalAmount(stringToDouble(paymentRaw.getPayment_details().getTotal_amount()));
+        newPay.setTotalWaiveWeight(stringToDouble(paymentRaw.getPayment_details().getTotal_waive_weight()));
+        newPay.setTotalWaiveAmount(stringToDouble(paymentRaw.getPayment_details().getTotal_waive_amount()));
+        newPay.setPaymentMethod(paymentRaw.getPayment_details().getPayment_method());
+        newPay.setStatus(paymentRaw.getPayment_details().getStatus());
         Payment payment = paymentRepository.save(newPay);
 
         if (payment != null) {
@@ -43,5 +45,10 @@ public class PaymentService {
             paxRepository.saveAll(paxes);
         }
         return payment.getId().toString();
+    }
+
+    private Double stringToDouble(String s) {
+        String cleanString = s.replace("Rp ", "").replace(".", "").replace("kg", "").trim();
+        return Double.parseDouble(cleanString);
     }
 }

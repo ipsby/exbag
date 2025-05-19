@@ -10,11 +10,11 @@ public class PassengerDTO {
     String phone;
     String booking_id;
     String flight_number;
-    String  route;
+    String route;
     String departure_date;
-    String  free_baggage;
+    String free_baggage;
     String actual_weight;
-    String   excess_weight;
+    String excess_weight;
     String excess_charge;
     Long pax_id;
 }

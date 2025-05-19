@@ -16,10 +16,20 @@ public class PaxService {
     @Autowired
     private BookingRepository bookingRepository;
 
+    public Pax createPax(Pax pax) {
+        return paxRepository.save(pax);
+    }
+
     public Pax updatePax(Long paxId, Pax updatedItem) {
         return paxRepository.findById(paxId)
                 .map(existingItem -> {
                     // Update only the fields that should be modifiable
+                    if (updatedItem.getPaxEmail() != null) {
+                        existingItem.setPaxEmail(updatedItem.getPaxEmail());
+                    }
+                    if (updatedItem.getPaxPhone() != null) {
+                        existingItem.setPaxPhone(updatedItem.getPaxPhone());
+                    }
                     if (updatedItem.getKtpNik() != null) {
                         existingItem.setKtpNik(updatedItem.getKtpNik());
                     }
@@ -72,6 +82,8 @@ public class PaxService {
                 .filter(item -> item.getId().equals(paxId))
                 .findFirst()
                 .map(item -> {
+                    item.setPaxEmail(updatedItem.getPaxEmail());
+                    item.setPaxPhone(updatedItem.getPaxPhone());
                     item.setKtpNik(updatedItem.getKtpNik());
                     item.setKtpNama(updatedItem.getKtpNama());
                     item.setKtpTptLahir(updatedItem.getKtpTptLahir());

@@ -1,28 +1,20 @@
 package com.iman.exbag.service;
-import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
-import java.util.Locale;
 import java.util.Optional;
-
 import org.springframework.beans.factory.annotation.Autowired;
-
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.iman.exbag.entity.Booking;
 import com.iman.exbag.entity.Flight;
 import com.iman.exbag.entity.Pax;
-import com.iman.exbag.entity.json.flight.FlightJSON;
 import com.iman.exbag.repository.BookingRepository;
 import com.iman.exbag.repository.FlightRepository;
 import com.iman.exbag.repository.PaxRepository;
-
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
@@ -243,6 +235,7 @@ public class ExternalApiService {
     	}
     }
     
+	/*
     private String parseBookingJsonNeo(String json) throws JsonMappingException, JsonProcessingException {
     	ObjectMapper mapper = new ObjectMapper();
     	DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
@@ -251,4 +244,5 @@ public class ExternalApiService {
     	FlightJSON FlightJson = mapper.readValue(json, FlightJSON.class);
     	return FlightJson.toString();
     }
+	*/
 }

@@ -4,7 +4,9 @@ import lombok.Data;
 
 @Data
 public class PaymentDetailsDTO {
-    Double total_amount;
+    String total_amount;
+    String total_waive_weight;
+    String total_waive_amount;
     String payment_method;
     String status;
 }
